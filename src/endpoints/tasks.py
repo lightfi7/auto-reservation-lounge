@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Request, status, HTTPException, BackgroundT
 from typing import List
 from fastapi.encoders import jsonable_encoder
 
-from src.bot.test import start
+from src.bot.test import award
 from src.models.task import Task
 from src.models.emulator import Emulator
 import src.bot.test
@@ -17,7 +17,7 @@ def award_task(request: Request, task: Task):
         "status": 0
     })
     # Award the task to this emulator
-    start(request, emulator, task)
+    award(request, emulator, task)
 
 @router.get("/", response_model=List[Task])
 def get_tasks(request: Request) -> List[Task]:
