@@ -17,7 +17,6 @@ def get_task(request: Request, task_id: str) ->Task:
 def create_task(request: Request, task: Task):
     task = jsonable_encoder(task)
     new_task = request.app.database["tasks"].insert_one(task)
-    print(new_task.inserted_id)
     created_task = request.app.database["tasks"].find_one({"_id": new_task.inserted_id})
     return created_task
 

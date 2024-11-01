@@ -1,13 +1,11 @@
-import uuid
-
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class Task(BaseModel):
     user_id: str
     action: str
-    log: str
-    success: int
+    success: bool | None = Field(default=True)
+    log: str | None = Field(default="")
 
     class Config:
         populate_by_name = True
@@ -15,7 +13,5 @@ class Task(BaseModel):
             "example": {
                 "user_id": "",
                 "action": "",
-                "success": 1,
-                "log": "",
             }
         }
