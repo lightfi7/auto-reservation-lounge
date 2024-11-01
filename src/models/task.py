@@ -14,8 +14,8 @@ class Task(BaseModel):
         populate_by_name = True
         json_schema_extra = {
             "example": {
-                "user_id": "<KEY>",
-                "action": "<ACTION>",
+                "user_id": "UserID",
+                "action": "Actions",
                 "success": 1,
                 "log": "Task created",
             }

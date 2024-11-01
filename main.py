@@ -8,16 +8,16 @@ from pymongo import MongoClient
 from src.routes.api import router as api_router
 load_dotenv()
 
-app = FastAPI()
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.mongo_client = MongoClient('mongodb://localhost:27017/')
-    app.db = app.mongo_client['lounge']
+    app.mongo_client = MongoClient('mongodb://127.0.0.1:27017/')
+    app.database = app.mongo_client['lounge']
     print("Connected to MongoDB")
     yield
     # Clean up the ML models and release the resources
     app.mongo_client.close()
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(api_router)
 
