@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field, validator
 
 
 class Task(BaseModel):
-    id: str=Field(default_factory=uuid.uuid4, alias='id')
     user_id: str
     action: str
     log: str
@@ -14,9 +13,9 @@ class Task(BaseModel):
         populate_by_name = True
         json_schema_extra = {
             "example": {
-                "user_id": "UserID",
-                "action": "Actions",
+                "user_id": "",
+                "action": "",
                 "success": 1,
-                "log": "Task created",
+                "log": "",
             }
         }
