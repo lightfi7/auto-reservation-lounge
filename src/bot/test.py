@@ -15,9 +15,11 @@ capabilities = dict(
 
 appium_server_url = 'http://localhost:4723'
 
-def start():
-    driver = webdriver.Remote(appium_server_url, options=UiAutomator2Options().load_capabilities(capabilities))
+def start(request, emulator, task):
+    request.app.database["emulators"].update_one({"_id": emulator["_id"]}, {"$set": {
+        "status": 1
+    }})
+    driver = webdriver.Remote(emulator["server_url"], options=UiAutomator2Options().load_capabilities(capabilities))
     wait = WebDriverWait(driver, 30)
-
     el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
     el.click()

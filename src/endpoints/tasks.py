@@ -1,9 +1,23 @@
-from fastapi import APIRouter, Body, Request, status, HTTPException
+from fastapi import APIRouter, Body, Request, status, HTTPException, BackgroundTasks
 from typing import List
 from fastapi.encoders import jsonable_encoder
+
+from src.bot.test import start
 from src.models.task import Task
+from src.models.emulator import Emulator
+import src.bot.test
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
+
+
+def award_task(request: Request, task: Task):
+    # Find the enabled emulator
+    emulator = request.app.database["emulators"].find_one({
+        "usable_num": {"$gt": 0},
+        "status": 0
+    })
+    # Award the task to this emulator
+    start(request, emulator, task)
 
 @router.get("/", response_model=List[Task])
 def get_tasks(request: Request) -> List[Task]:
@@ -14,10 +28,11 @@ def get_task(request: Request, task_id: str) ->Task:
     return request.app.database["tasks"].find_one({"_id": task_id})
 
 @router.post("/", response_model=Task)
-def create_task(request: Request, task: Task):
+def create_task(request: Request, task: Task, background_tasks: BackgroundTasks):
     task = jsonable_encoder(task)
     new_task = request.app.database["tasks"].insert_one(task)
     created_task = request.app.database["tasks"].find_one({"_id": new_task.inserted_id})
+    background_tasks.add_task(award_task, request, created_task)
     return created_task
 
 @router.put("/{task_id}", response_model=Task)
