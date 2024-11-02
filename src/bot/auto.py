@@ -1,15 +1,8 @@
-import json
-import time
-from asyncio import wait_for
-
-from anyio.abc import value
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
-from mitmproxy.version import MITMPROXY
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from appium.webdriver.common.appiumby import AppiumBy
-from selenium.webdriver import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 capabilities = dict(
     platformName='Android',
