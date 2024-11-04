@@ -130,24 +130,26 @@ def award(request, emulator, task):
         # el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.ScrollView/android.view.View/android.widget.ImageView[3]')))
         # el.click()
 
-        return
-
-        el = wait.until(EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, 'Оформить')))
-        el.click()
-
-        # get qr code
-        base64_image = driver.get_screenshot_as_png()
+        # return
         #
+        # el = wait.until(EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, 'Оформить')))
+        # el.click()
+        #
+        # # get qr code
+        # base64_image = driver.get_screenshot_as_png()
+        # #
+        #
+        # request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
+        #     "success": True,
+        #     "log": "Success",
+        #     "base64_image": f"{base64_image}"
+        # }})
 
-        request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
-            "success": True,
-            "log": "Success",
-            "base64_image": f"{base64_image}"
-        }})
-        # driver.back()
-        # driver.back()
-        # driver.back()
-        # driver.quit()
+        driver.back()
+        driver.back()
+        driver.back()
+        driver.back()
+        
     except Exception as e:
         request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
             "success": False,
