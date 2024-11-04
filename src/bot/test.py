@@ -130,7 +130,7 @@ def award(request, emulator, task):
         # el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.ScrollView/android.view.View/android.widget.ImageView[3]')))
         # el.click()
 
-        # return
+        return
 
         el = wait.until(EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, 'Оформить')))
         el.click()
