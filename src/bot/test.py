@@ -106,8 +106,9 @@ def award(request, emulator, task):
         el = None
         while True:
             driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,
-                                    'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(5)')
+                                    'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(10)')
             time.sleep(1)
+            break
             if is_at_bottom(driver):
                 break
 
@@ -149,7 +150,7 @@ def award(request, emulator, task):
         driver.back()
         driver.back()
         driver.back()
-        
+
     except Exception as e:
         request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
             "success": False,
