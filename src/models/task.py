@@ -6,7 +6,7 @@ class Task(BaseModel):
     action: str
     success: bool | None = Field(default=False)
     log: str | None = Field(default="")
-    result: str | None = Field(default="")
+    base64_image: str | None = Field(default="")
 
     class Config:
         populate_by_name = True

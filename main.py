@@ -5,6 +5,7 @@ from fastapi import FastAPI
 import uvicorn
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from fastapi.staticfiles import StaticFiles
 from src.routes.api import router as api_router
 load_dotenv()
 
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.mount("/files", StaticFiles(directory="uploads"), name="files")
 app.include_router(api_router)
 
 if __name__ == "__main__":
