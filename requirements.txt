@@ -1,0 +1,7 @@
+Appium-Python-Client~=4.2.0
+selenium~=4.25.0
+pydantic~=2.9.2
+fastapi~=0.115.4
+uvicorn~=0.32.0
+python-dotenv~=1.0.1
+pymongo~=4.10.1

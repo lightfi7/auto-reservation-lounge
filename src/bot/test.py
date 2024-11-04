@@ -134,6 +134,8 @@ def award(request, emulator, task):
         el = wait.until(EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, 'Оформить')))
         el.click()
 
+        # get qr code
+
         #
 
         # driver.back()
@@ -141,6 +143,10 @@ def award(request, emulator, task):
         # driver.back()
         # driver.quit()
     except Exception as e:
+        request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
+            "success": False,
+            "log": e,
+        }})
         print(e)
 
     # End
