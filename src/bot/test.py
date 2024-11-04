@@ -149,7 +149,6 @@ def award(request, emulator, task):
         driver.back()
         driver.back()
         driver.back()
-        driver.back()
 
     except Exception as e:
         request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
