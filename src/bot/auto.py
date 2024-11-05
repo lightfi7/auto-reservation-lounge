@@ -22,17 +22,8 @@ logging.error("This is an error message")
 logging.critical("This is a critical message")
 
 
-capabilities = dict(
-    platformName='Android',
-    automationName='uiautomator2',
-    deviceName='emulator-5556',
-    appPackage='com.everylounge',
-    appActivity='.MainActivity',
-    autoGrantPermissions=True,
-    noReset=True
-)
 
-appium_server_url = 'http://localhost:4723'
+appium_server_url = 'http://127.0.0.1:4724'
 
 
 def is_at_bottom(driver):
@@ -42,12 +33,23 @@ def is_at_bottom(driver):
 def award(request, emulator, task):
     logging.info(f"user: {task['user_id']} {task['params']}")
     logging.info(f"emulator: {emulator['server_url']}/{emulator['usable_num']}")
-    request.app.database["emulators"].update_one({"_id": emulator["_id"]}, {"$set": {
+    request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
         "status": 1
     }})
 
+    capabilities = dict(
+        platformName='Android',
+        automationName='uiautomator2',
+        deviceName='emulator-5558',
+        appPackage='com.everylounge',
+        appActivity='.MainActivity',
+        autoGrantPermissions=True,
+        noReset=True,
+        udid=emulator["udid"]
+    )
+
     # Start
-    driver = webdriver.Remote(emulator["server_url"], options=UiAutomator2Options().load_capabilities(capabilities))
+    driver = webdriver.Remote(appium_server_url, options=UiAutomator2Options().load_capabilities(capabilities))
     wait = WebDriverWait(driver, 30)
     # el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
     # el.click()
@@ -66,7 +68,7 @@ def award(request, emulator, task):
 
     # Business Lounge \ Travel
     try:
-        params = json.loads(task['params'])
+        params = task['params']
 
         el_business = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
                                                              '//android.widget.ImageView[@content-desc="Выбрать\nбизнес-зал\nПутешествуйте\nс комфортом"]')))
@@ -138,13 +140,13 @@ def award(request, emulator, task):
         # base64_image = driver.get_screenshot_as_png()
         # #
         #
-        # request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
+        # request.app.database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
         #     "success": True,
         #     "log": "Success",
         #     "base64_image": f"{base64_image}"
         # }})
 
-        # request.app.database["emulators"].update_one({"_id": emulator["_id"]}, {"$set": {
+        # request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
         #     "status": 0,
         #     "usable_num": emulator["usable_num"] - 1
         # }})
@@ -155,11 +157,11 @@ def award(request, emulator, task):
 
     except Exception as e:
         logging.info(f'error: {e}')
-        request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
+        request.app.database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
             "success": False,
             "log": e,
         }})
-        request.app.database["emulators"].update_one({"_id": emulator["_id"]}, {"$set": {
+        request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
             "status": 0,
         }})
         print(e)

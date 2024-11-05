@@ -1,12 +1,10 @@
-from typing import Optional
-from typing_extensions import Annotated
+from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, BeforeValidator
+from pydantic import BaseModel, Field
 
-PyObjectId = Annotated[str, BeforeValidator(str)]
 
 class Task(BaseModel):
-    id: PyObjectId = Field(..., alias="_id")
+    id: UUID = Field(default_factory=uuid4)
     user_id: str
     params: list[str] = []
     success: bool | None = Field(default=False)
@@ -14,7 +12,6 @@ class Task(BaseModel):
     log: str | None = Field(default="")
 
     class Config:
-        populate_by_name = True
         json_schema_extra = {
             "example": {
                 "user_id": "",

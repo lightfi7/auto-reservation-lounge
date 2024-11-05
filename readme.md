@@ -30,27 +30,28 @@ android studio
 ### Emulator
 
     class Emulator(BaseModel):
-        id: Optional[PyObjectId] = Field(alias="_id", default=None),
-        name: str
-        description: str
-        server_url: str
-        usable_num: int | None = Field(default=2)
-        status: int | None = Field(default=0)
-    
-        class Config:
-            populate_by_name = True
-            json_schema_extra = {
-                "example": {
-                    "name": "Local emulator",
-                    "description": "This is the local emulator",
-                    "server_url": "http://127.0.0.1:4723",
-                }
+    id: UUID = Field(default_factory=uuid4)
+    name: str
+    description: str
+    server_url: str
+    udid: str
+    usable_num: int | None = Field(default=2)
+    status: int | None = Field(default=0)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Local emulator",
+                "description": "This is the local emulator",
+                "server_url": "http://127.0.0.1:4723",
+                "udid": "emulator-5556",
             }
+        }
 
 ### Task
 
     class Task(BaseModel):
-        id: Optional[PyObjectId] = Field(alias="_id", default=None),
+        id: PyObjectId = Field(..., alias="_id")
         user_id: str
         params: str
         success: bool | None = Field(default=False)
@@ -69,4 +70,10 @@ android studio
 
 
 # Appium
-    
+    appium
+
+# Devices
+    $ adb devices
+    List of devices attached
+    emulator-5556   device
+    emulator-5558   device
