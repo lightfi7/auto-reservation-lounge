@@ -1,7 +1,11 @@
-from pydantic import BaseModel, Field
+from typing import Annotated, Optional
 
+from pydantic import BaseModel, Field, BeforeValidator
+
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
 class Emulator(BaseModel):
+    id: PyObjectId = Field(..., alias="_id")
     name: str
     description: str
     server_url: str
