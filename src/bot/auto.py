@@ -1,52 +1,55 @@
 import time
 from datetime import datetime
-
+import json
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import logging
 
-capabilities = dict(
-    platformName='Android',
-    automationName='uiautomator2',
-    deviceName='Android',
-    appPackage='com.everylounge',
-    appActivity='.MainActivity',
-    autoGrantPermissions=True,
-    noReset=True
-)
+# Basic configuration for logging
+logging.basicConfig(level=logging.INFO,
+                    filename='log.ini',
+                    filemode='a',  # 'w' for overwrite, 'a' for append
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
-appium_server_url = 'http://localhost:4723'
+# Logging messages at different levels
+logging.debug("This is a debug message")  # Will not be logged since level is INFO
+logging.info("This is an info message")
+logging.warning("This is a warning message")
+logging.error("This is an error message")
+logging.critical("This is a critical message")
+
+
+
+appium_server_url = 'http://127.0.0.1:4724'
 
 
 def is_at_bottom(driver):
-    # Get the current visible elements
-    current_elements = driver.find_elements(AppiumBy.XPATH, '//*[not(@visibility="gone")]')
-    return len(current_elements) == 0  # Adjust based on your app's behavior
-
+    return driver.execute_script("return mobile.scrollGesture();")
 
 
 def award(request, emulator, task):
-    request.app.database["emulators"].update_one({"_id": emulator["_id"]}, {"$set": {
+    logging.info(f"user: {task['user_id']} {task['params']}")
+    logging.info(f"emulator: {emulator['server_url']}/{emulator['usable_num']}")
+    request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
         "status": 1
     }})
 
-    action = dict(Type="Lounge", Actions=[
-        {
-            "Find": "Даллес@Вашингтон, США"
-        },
-        {
-            "Find": "Turkish Airlines Lounge@Зал B"
-        },
-        {
-            "Name": "<First name>@<Last name>",
-        }
-    ])
-
+    capabilities = dict(
+        platformName='Android',
+        automationName='uiautomator2',
+        deviceName='emulator-5558',
+        appPackage='com.everylounge',
+        appActivity='.MainActivity',
+        autoGrantPermissions=True,
+        noReset=True,
+        udid=emulator["udid"]
+    )
 
     # Start
-    driver = webdriver.Remote(emulator["server_url"], options=UiAutomator2Options().load_capabilities(capabilities))
+    driver = webdriver.Remote(appium_server_url, options=UiAutomator2Options().load_capabilities(capabilities))
     wait = WebDriverWait(driver, 30)
     # el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
     # el.click()
@@ -65,6 +68,8 @@ def award(request, emulator, task):
 
     # Business Lounge \ Travel
     try:
+        params = task['params']
+
         el_business = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
                                                              '//android.widget.ImageView[@content-desc="Выбрать\nбизнес-зал\nПутешествуйте\nс комфортом"]')))
         el_business.click()
@@ -72,28 +77,24 @@ def award(request, emulator, task):
         #
         el_search = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.EditText')))
         el_search.click()
-        title, location = action['Actions'][0]['Find'].split('@')
+        title, location = params[0].split('@')
         el_search.send_keys(title)
 
         el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, f'//android.view.View//*[contains(@content-desc, "{location}")]')))
 
-        print(el.get_attribute('content-desc'))
         el.click()
 
         el = None
-        name, group = action['Actions'][1]['Find'].split('@')
+        name, group = params[1].split('@')
         while True:
-            print('=>')
             el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, f'//android.view.View//*[contains(@content-desc, "{name}\n{group}")]')))
             if el is None:
                 driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,
                                     'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(5)')
             else:
-                print(';)')
                 break
             time.sleep(1)
             if is_at_bottom(driver):
-                print(';(')
                 break
         el.click()
 
@@ -106,13 +107,12 @@ def award(request, emulator, task):
         el = None
         while True:
             driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,
-                                    'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(10)')
+                                    'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(1)')
             time.sleep(1)
-            break
             if is_at_bottom(driver):
                 break
 
-        first_name, last_name = action['Actions'][2]['Name'].split('@')
+        first_name, last_name = params[2].split('@')
 
         el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.ScrollView/android.view.View/android.widget.EditText[1]/android.widget.ImageView')))
         el.click()
@@ -140,10 +140,15 @@ def award(request, emulator, task):
         # base64_image = driver.get_screenshot_as_png()
         # #
         #
-        # request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
+        # request.app.database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
         #     "success": True,
         #     "log": "Success",
         #     "base64_image": f"{base64_image}"
+        # }})
+
+        # request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
+        #     "status": 0,
+        #     "usable_num": emulator["usable_num"] - 1
         # }})
 
         driver.back()
@@ -151,19 +156,19 @@ def award(request, emulator, task):
         driver.back()
 
     except Exception as e:
-        request.app.database["tasks"].update_one({"_id": emulator["_id"]}, {"$set": {
+        logging.info(f'error: {e}')
+        request.app.database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
             "success": False,
             "log": e,
+        }})
+        request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
+            "status": 0,
         }})
         print(e)
 
     # End
 
 
-    request.app.database["emulators"].update_one({"_id": emulator["_id"]}, {"$set": {
-        "status": 0,
-        "usable_num": emulator["usable_num"]-1
-    }})
 
 
 
