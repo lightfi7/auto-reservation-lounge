@@ -23,7 +23,7 @@ logging.critical("This is a critical message")
 
 
 
-appium_server_url = 'http://127.0.0.1:4724'
+appium_server_url = 'http://127.0.0.1:4723'
 
 
 def is_at_bottom(driver):
