@@ -93,7 +93,7 @@ def award(request, emulator, task):
                                     'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(5)')
             else:
                 break
-            time.sleep(1)
+            time.sleep(5)
             if is_at_bottom(driver):
                 break
         el.click()
@@ -108,7 +108,7 @@ def award(request, emulator, task):
         while True:
             driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,
                                     'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(1)')
-            time.sleep(1)
+            time.sleep(5)
             if is_at_bottom(driver):
                 break
 
