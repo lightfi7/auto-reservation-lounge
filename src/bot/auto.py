@@ -23,9 +23,6 @@ logging.critical("This is a critical message")
 
 
 
-appium_server_url = 'http://127.0.0.1:4723'
-
-
 def is_at_bottom(driver):
     return driver.execute_script("return mobile.scrollGesture();")
 
@@ -49,7 +46,7 @@ def award(request, emulator, task):
     )
 
     # Start
-    driver = webdriver.Remote(appium_server_url, options=UiAutomator2Options().load_capabilities(capabilities))
+    driver = webdriver.Remote(emulator["server_url"], options=UiAutomator2Options().load_capabilities(capabilities))
     wait = WebDriverWait(driver, 30)
     # el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
     # el.click()

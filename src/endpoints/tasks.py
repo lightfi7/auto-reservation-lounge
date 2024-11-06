@@ -12,7 +12,7 @@ def award_task(request: Request, task: Task):
     # Find the enabled emulator
     emulator = request.app.database["emulators"].find_one({
         "usable_num": {"$gt": 0},
-        # "status": 0
+        "status": 0
     })
     # Award the task to this emulator
     award(request, emulator, task)
