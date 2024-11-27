@@ -1,18 +1,20 @@
+from uuid import UUID, uuid4
+
 from pydantic import BaseModel, Field
 
 
 class Task(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
     user_id: str
-    action: str
+    params: list[str] = []
     success: bool | None = Field(default=False)
-    log: str | None = Field(default="")
     base64_image: str | None = Field(default="")
+    log: str | None = Field(default="")
 
     class Config:
-        populate_by_name = True
         json_schema_extra = {
             "example": {
                 "user_id": "",
-                "action": "",
+                "params": ['Даллес@Вашингтон, США', 'Turkish Airlines Lounge@Зал B', 'John@Doe'],
             }
         }
