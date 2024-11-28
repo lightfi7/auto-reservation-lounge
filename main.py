@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from fastapi.staticfiles import StaticFiles
 from src.routes.api import router as api_router
+
 load_dotenv()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,6 +19,7 @@ async def lifespan(app: FastAPI):
     yield
     # Clean up the ML models and release the resources
     app.mongo_client.close()
+
 
 app = FastAPI(lifespan=lifespan)
 

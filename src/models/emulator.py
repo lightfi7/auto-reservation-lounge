@@ -1,10 +1,10 @@
-from uuid import UUID, uuid4
+import uuid
 
 from pydantic import BaseModel, Field
 
 
 class Emulator(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
+    id: str = Field(default=str(uuid.uuid4().hex))
     name: str
     description: str
     server_url: str
