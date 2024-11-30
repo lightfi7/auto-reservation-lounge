@@ -3,7 +3,6 @@ from typing import List
 from fastapi import APIRouter, Request, status, HTTPException, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 
-from src.bot.auto import award
 from src.models.task import Task
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
@@ -15,8 +14,6 @@ def award_task(request: Request, task: Task):
         "usable_num": {"$gt": 0},
         "status": 0
     })
-    # Award the task to this emulator
-    award(request, emulator, task)
 
 @router.get("/", response_model=List[Task])
 def get_tasks(request: Request) -> List[Task]:

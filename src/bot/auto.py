@@ -22,49 +22,48 @@ logging.error("This is an error message")
 logging.critical("This is a critical message")
 
 
-
 def is_at_bottom(driver):
     return driver.execute_script("return mobile.scrollGesture();")
 
 
-def award(request, emulator, task):
-    logging.info(f"user: {task['user_id']} {task['params']}")
-    logging.info(f"emulator: {emulator['server_url']}/{emulator['usable_num']}")
-    request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
-        "status": 1
-    }})
-
-    capabilities = dict(
-        platformName='Android',
-        automationName='uiautomator2',
-        deviceName='emulator-5558',
-        appPackage='com.everylounge',
-        appActivity='.MainActivity',
-        autoGrantPermissions=True,
-        noReset=True,
-        udid=emulator["udid"]
-    )
-
-    # Start
-    driver = webdriver.Remote(emulator["server_url"], options=UiAutomator2Options().load_capabilities(capabilities))
-    wait = WebDriverWait(driver, 30)
-    # el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
-    # el.click()
-
-    # Login
-    # armhouse.kz@gmail.com
-
-    # el_close = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
-    #                                                   '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')))
-    # # el_close = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')
-    # el_close.click()
-
-    # el_continue = wait.until(
-    #     EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.Button[@content-desc="В другой раз"]')))
-    # el_continue.click()
-
-    # Business Lounge \ Travel
+def award(database, emulator, task):
     try:
+        logging.info(f"user: {task['user_id']} {task['params']}")
+        logging.info(f"emulator: {emulator['server']}/{emulator['usable_num']}")
+        database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
+            "status": 1
+        }})
+
+        capabilities = dict(
+            platformName='Android',
+            automationName='uiautomator2',
+            deviceName='emulator-5558',
+            appPackage='com.everylounge',
+            appActivity='.MainActivity',
+            autoGrantPermissions=True,
+            noReset=True,
+            udid=emulator["udid"]
+        )
+
+        # Start
+        driver = webdriver.Remote(f"http://{emulator["server"]}:4723", options=UiAutomator2Options().load_capabilities(capabilities))
+        wait = WebDriverWait(driver, 30)
+        # el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
+        # el.click()
+
+        # Login
+        # armhouse.kz@gmail.com
+
+        # el_close = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
+        #                                                   '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')))
+        # # el_close = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')
+        # el_close.click()
+
+        # el_continue = wait.until(
+        #     EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.Button[@content-desc="В другой раз"]')))
+        # el_continue.click()
+
+        # Business Lounge \ Travel
         params = task['params']
 
         el_business = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
@@ -77,14 +76,16 @@ def award(request, emulator, task):
         title, location = params[0].split('@')
         el_search.send_keys(title)
 
-        el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, f'//android.view.View//*[contains(@content-desc, "{location}")]')))
+        el = wait.until(EC.element_to_be_clickable(
+            (AppiumBy.XPATH, f'//android.view.View//*[contains(@content-desc, "{location}")]')))
 
         el.click()
 
         el = None
         name, group = params[1].split('@')
         while True:
-            el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, f'//android.view.View//*[contains(@content-desc, "{name}\n{group}")]')))
+            el = wait.until(EC.element_to_be_clickable(
+                (AppiumBy.XPATH, f'//android.view.View//*[contains(@content-desc, "{name}\n{group}")]')))
             if el is None:
                 driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,
                                     'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(5)')
@@ -104,21 +105,23 @@ def award(request, emulator, task):
         el = None
         while True:
             driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR,
-                                    'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(1)')
+                                'new UiScrollable(new UiSelector().scrollable(true)).flingToEnd(1)')
             time.sleep(5)
             if is_at_bottom(driver):
                 break
 
         first_name, last_name = params[2].split('@')
 
-        el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.ScrollView/android.view.View/android.widget.EditText[1]/android.widget.ImageView')))
+        el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
+                                                    '//android.widget.ScrollView/android.view.View/android.widget.EditText[1]/android.widget.ImageView')))
         el.click()
         el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
                                                     '//android.widget.ScrollView/android.view.View/android.widget.EditText[1]')))
         el.click()
         el.send_keys(first_name)
 
-        el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.ScrollView/android.view.View/android.widget.EditText[2]/android.widget.ImageView')))
+        el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
+                                                    '//android.widget.ScrollView/android.view.View/android.widget.EditText[2]/android.widget.ImageView')))
         el.click()
         el = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
                                                     '//android.widget.ScrollView/android.view.View/android.widget.EditText[2]')))
@@ -137,16 +140,16 @@ def award(request, emulator, task):
         # base64_image = driver.get_screenshot_as_png()
         # #
         #
-        # request.app.database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
+        # database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
         #     "success": True,
         #     "log": "Success",
         #     "base64_image": f"{base64_image}"
         # }})
 
-        # request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
-        #     "status": 0,
-        #     "usable_num": emulator["usable_num"] - 1
-        # }})
+        database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
+            "status": 0,
+            "usable_num": emulator["usable_num"] - 1
+        }})
 
         driver.back()
         driver.back()
@@ -154,20 +157,13 @@ def award(request, emulator, task):
 
     except Exception as e:
         logging.info(f'error: {e}')
-        request.app.database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
+        database["tasks"].update_one({"id": emulator["id"]}, {"$set": {
             "success": False,
             "log": e,
         }})
-        request.app.database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
+        database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
             "status": 0,
         }})
         print(e)
 
-    # End
-
-
-
-
-
-
-
+# End
