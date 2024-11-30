@@ -57,11 +57,11 @@ Before you begin, ensure that you have the following software installed:
     - Add another variable `ANDROID_HOME` pointing to your Android SDK location (e.g., `C:\Users\<YourUsername>\AppData\Local\Android\Sdk`).
     - Update the `Path` variable by adding `%JAVA_HOME%\bin` and `%ANDROID_HOME%\platform-tools`.
 
-### 4. Create Bluestack Emulator and Settings
-  - Launch BlueStacks on your computer.
+### 4. Create LDPlayer Emulator and Setup the manager 
+  - Launch LDPlayer on your computer.
   - Click on the hamburger menu (three horizontal lines) or the gear icon in the top right corner to open the Settings menu.
-  - In the Settings menu, navigate to the Advanced section.
-  - Find the option labeled Enable Android Debug Bridge (ADB) and toggle it on. Ensure that BlueStacks remains open while you make this change.
+  - In the Settings menu, navigate to the Others section.
+  - Select the option labeled "Enable local connection" in "ADB debugging" and toggle it on. Ensure that LDPlayer remains open while you make this change.
   - Open a command prompt or terminal window on your computer.
   - Navigate to the directory where adb.exe is located, typically found in:
     ```
@@ -73,7 +73,9 @@ Before you begin, ensure that you have the following software installed:
     ```
   - This should list your BlueStacks instance as a connected device.
   - Install the Lounge app on your emulator and log in.
-  - After log in, you should keep the Lounge app at the first page.
+  - Then download the manager source from https://github.com/lightfi7/ldplayer-manager-api.git
+  - After download, navigate the source folder and run the "npm install"
+  - Run the command "node index.js" to run the manager.
 
 ### 5. Start Appium Server
 
@@ -153,20 +155,21 @@ The `Emulator` model represents an emulator instance in the system.
 
 ```python
 class Emulator(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
+    id: str = Field(default=str(uuid.uuid4().hex))
     name: str
     description: str
-    server_url: str
+    server: str
     udid: str
     usable_num: int | None = Field(default=2)
-    status: int | None = Field(default=0)
+    status: int | None = Field(default=2)
+    date: datetime = Field(default_factory=datetime.today)
 
     class Config:
         json_schema_extra = {
             "example": {
-                "name": "Local Emulator",
+                "name": "Local emulator",
                 "description": "This is the local emulator",
-                "server_url": "http://127.0.0.1:4723",
+                "server": "127.0.0.1",
                 "udid": "emulator-5556",
             }
         }
