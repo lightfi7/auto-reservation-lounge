@@ -12,7 +12,7 @@ class Emulator(BaseModel):
     udid: str
     usable_num: int | None = Field(default=2)
     status: int | None = Field(default=2)
-    date: datetime = Field(default_factory=datetime.utcnow)
+    date: datetime = Field(default_factory=datetime.today)
 
     class Config:
         json_schema_extra = {
@@ -21,6 +21,5 @@ class Emulator(BaseModel):
                 "description": "This is the local emulator",
                 "server": "127.0.0.1",
                 "udid": "emulator-5556",
-                "date": "2024-02-13 08:20:30"
             }
         }

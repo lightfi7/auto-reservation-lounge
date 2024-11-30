@@ -27,13 +27,10 @@ def task_manager_job():
         # Find the tasks
         tasks = database["tasks"].find({
             "success": False,
-            "base64_image": '',
         })
+        servers = database["emulators"].distinct("server")
 
         for task in tasks:
-            # Find the servers
-            servers = database["emulators"].distinct("server")
-
             for server in servers:
                 # If one emulator is live now
                 emulator = database["emulators"].find_one({
@@ -64,9 +61,11 @@ def task_manager_job():
                     # Turn on the emulator
                     url = f"http://{emulator['server']}:5000/command"
 
-                    requests.post(url, json={
-                        "command": f"dnconsole.exe launch --name \"{emulator["name"]}\"",
+                    r = requests.post(url, json={
+                        "command": f"launch --name \"{emulator["name"]}\"",
                     })
+                    if r.status_code == 200:
+                        print(r.json())
 
                     database["emulators"].update_one({
                         "id": emulator["id"]
@@ -93,6 +92,7 @@ def instance_manager_job():
 
         # Check the emulator
         for emulator in emulators:
+
             today = datetime.today()
             em_date = datetime.strptime(emulator["date"], "%Y-%m-%dT%H:%M:%S.%f")
             if is_over_one_month(em_date, today):
@@ -100,13 +100,16 @@ def instance_manager_job():
                     "id": emulator["id"],
                 }, {"$set": {
                     "usable_num": 2,
+                    "status": 0,
+                    "date": datetime.today
                 }})
             else:
-                # Turn off the emulator
                 url = f"http://{emulator['server']}:5000/command"
-                requests.post(url, json={
-                    "command": f"dnconsole.exe quit --name \"{emulator["name"]}\"",
+                r = requests.post(url, json={
+                    "command": f"quit --name \"{emulator["name"]}\"",
                 })
+                if r.status_code == 200:
+                    print(r.json())
                 database["emulators"].update_one({
                     "id": emulator["id"]
                 }, {
@@ -120,8 +123,8 @@ def instance_manager_job():
 
 
 # Schedule the job every minute
-schedule.every(3).minutes.do(task_manager_job)
-schedule.every(5).seconds.do(instance_manager_job)
+schedule.every(5).seconds.do(task_manager_job)
+# schedule.every(5).seconds.do(instance_manager_job)
 
 while True:
     schedule.run_pending()  # Run pending tasks

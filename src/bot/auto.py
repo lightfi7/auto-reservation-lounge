@@ -30,9 +30,6 @@ def award(database, emulator, task):
     try:
         logging.info(f"user: {task['user_id']} {task['params']}")
         logging.info(f"emulator: {emulator['server']}/{emulator['usable_num']}")
-        database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
-            "status": 1
-        }})
 
         capabilities = dict(
             platformName='Android',
@@ -50,6 +47,10 @@ def award(database, emulator, task):
         wait = WebDriverWait(driver, 30)
         # el = driver.find_element(by=AppiumBy.XPATH, value='//*[@text="Battery"]')
         # el.click()
+
+        database["emulators"].update_one({"id": emulator["id"]}, {"$set": {
+            "status": 1
+        }})
 
         # Login
         el_close = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
