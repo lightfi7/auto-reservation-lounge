@@ -123,8 +123,8 @@ def instance_manager_job():
 
 
 # Schedule the job every minute
-schedule.every(5).seconds.do(task_manager_job)
-# schedule.every(5).seconds.do(instance_manager_job)
+schedule.every(30).seconds.do(task_manager_job)
+schedule.every(5).minutes.do(instance_manager_job)
 
 while True:
     schedule.run_pending()  # Run pending tasks
