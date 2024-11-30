@@ -36,7 +36,6 @@ def task_manager_job():
 
             for server in servers:
                 # If one emulator is live now
-
                 emulator = database["emulators"].find_one({
                     "server": server,
                     "status": 1,
@@ -58,7 +57,7 @@ def task_manager_job():
                         "usable_num": {"$gt": 0},
                         "status": 2
                     })
-                    
+
                     if emulator is None:
                         continue
 
@@ -121,8 +120,8 @@ def instance_manager_job():
 
 
 # Schedule the job every minute
-schedule.every(1).minutes.do(task_manager_job)
-schedule.every(1).seconds.do(instance_manager_job)
+schedule.every(3).minutes.do(task_manager_job)
+schedule.every(5).seconds.do(instance_manager_job)
 
 while True:
     schedule.run_pending()  # Run pending tasks

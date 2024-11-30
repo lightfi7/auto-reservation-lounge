@@ -52,16 +52,14 @@ def award(database, emulator, task):
         # el.click()
 
         # Login
-        # armhouse.kz@gmail.com
+        el_close = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
+                                                          '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')))
+        # el_close = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')
+        el_close.click()
 
-        # el_close = wait.until(EC.element_to_be_clickable((AppiumBy.XPATH,
-        #                                                   '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')))
-        # # el_close = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.widget.ImageView')
-        # el_close.click()
-
-        # el_continue = wait.until(
-        #     EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.Button[@content-desc="В другой раз"]')))
-        # el_continue.click()
+        el_continue = wait.until(
+            EC.element_to_be_clickable((AppiumBy.XPATH, '//android.widget.Button[@content-desc="В другой раз"]')))
+        el_continue.click()
 
         # Business Lounge \ Travel
         params = task['params']
