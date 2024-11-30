@@ -8,20 +8,15 @@ from src.models.task import Task
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
-def award_task(request: Request, task: Task):
-    # Find the enabled emulator
-    emulator = request.app.database["emulators"].find_one({
-        "usable_num": {"$gt": 0},
-        "status": 0
-    })
-
 @router.get("/", response_model=List[Task])
 def get_tasks(request: Request) -> List[Task]:
     return request.app.database["tasks"].find()
 
+
 @router.get("/{task_id}", response_model=Task)
-def get_task(request: Request, task_id: str) ->Task:
+def get_task(request: Request, task_id: str) -> Task:
     return request.app.database["tasks"].find_one({"id": task_id})
+
 
 @router.post("/", response_model=Task)
 def create_task(request: Request, task: Task, background_tasks: BackgroundTasks):
@@ -29,8 +24,8 @@ def create_task(request: Request, task: Task, background_tasks: BackgroundTasks)
     task['id'] = str(uuid.uuid4())
     new_task = request.app.database["tasks"].insert_one(task)
     created_task = request.app.database["tasks"].find_one({"_id": new_task.inserted_id})
-    background_tasks.add_task(award_task, request, created_task)
     return created_task
+
 
 @router.put("/{task_id}", response_model=Task)
 def update_task(request: Request, task_id: str, task: Task):
@@ -44,10 +39,10 @@ def update_task(request: Request, task_id: str, task: Task):
         return existing_task
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
 
+
 @router.delete("/{task_id}", response_model=Task)
 def delete_task(request: Request, task_id: str):
     deleted_task = request.app.database["tasks"].delete_one({"id": task_id})
     if deleted_task.matched_count == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
     return f"Task with ID {task_id} deleted"
-
